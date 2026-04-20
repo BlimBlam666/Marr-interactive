@@ -52,6 +52,13 @@ export function MapViewer({ content, areas, gmEnabled }: MapViewerProps) {
 
   return (
     <div className="space-y-4 sm:space-y-5">
+      {gmEnabled ? (
+        <div className="rounded border border-[#c9924a]/35 bg-[#3a2515]/35 px-4 py-3 text-sm leading-6 text-[#ead8ba] shadow-[0_0_28px_rgba(201,146,74,0.08)]">
+          <span className="font-semibold text-[#f0c987]">GM mode active.</span>{" "}
+          Sealed notes, secrets, stat ideas, and hidden relationships can appear in the codex.
+        </div>
+      ) : null}
+
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <Breadcrumbs
           area={selectedArea}
@@ -64,6 +71,7 @@ export function MapViewer({ content, areas, gmEnabled }: MapViewerProps) {
             <button
               key={area.id}
               type="button"
+              aria-pressed={area.id === selectedArea.id}
               onClick={() => selectArea(area.id)}
               className={`rounded border px-4 py-2 text-sm transition ${
                 area.id === selectedArea.id
@@ -77,12 +85,6 @@ export function MapViewer({ content, areas, gmEnabled }: MapViewerProps) {
         </div>
       </div>
 
-      {gmEnabled ? (
-        <div className="rounded border border-[#8b3a2f]/45 bg-[#8b3a2f]/16 px-4 py-3 text-sm text-[#f1d1c8]">
-          GM Mode is active. Sealed notes, hidden relationships, and stat blocks may be visible.
-        </div>
-      ) : null}
-
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_400px] xl:grid-cols-[minmax(0,1fr)_430px]">
         <section className="min-w-0">
           <div className="marr-panel overflow-hidden rounded">
@@ -91,7 +93,7 @@ export function MapViewer({ content, areas, gmEnabled }: MapViewerProps) {
                 viewBox={viewBox}
                 role="img"
                 aria-label={`${selectedArea.title} interactive map`}
-                className="block aspect-[4/3] min-h-[360px] w-full bg-[#10110d] transition-[view-box] duration-300 sm:min-h-[460px]"
+                className="block aspect-[4/3] min-h-[280px] w-full bg-[#10110d] transition-[view-box] duration-300 sm:min-h-[460px]"
               >
                 <defs>
                   <filter id="hotspotGlow" x="-40%" y="-40%" width="180%" height="180%">
@@ -130,7 +132,7 @@ export function MapViewer({ content, areas, gmEnabled }: MapViewerProps) {
                 )}
               </svg>
             ) : (
-              <div className="grid aspect-[4/3] min-h-[360px] place-items-center p-8 text-center sm:min-h-[460px]">
+              <div className="grid aspect-[4/3] min-h-[280px] place-items-center p-8 text-center sm:min-h-[460px]">
                 <div>
                   <p className="text-lg font-semibold text-stone-100">Map unavailable</p>
                   <p className="mt-2 max-w-md text-sm leading-6 text-stone-400">
@@ -158,14 +160,32 @@ export function MapViewer({ content, areas, gmEnabled }: MapViewerProps) {
               {selectedArea.description}
             </p>
           </div>
+
+          <div className="mt-3 flex flex-wrap gap-2">
+            {areaNodes.map((node) => (
+              <button
+                key={node.id}
+                type="button"
+                aria-pressed={selectedNode?.id === node.id}
+                onClick={() => selectNode(node)}
+                className={`rounded border px-2.5 py-1.5 text-xs transition ${
+                  selectedNode?.id === node.id
+                    ? "border-[#c9924a]/45 bg-[#c9924a]/13 text-[#eee7d7]"
+                    : "marr-hairline bg-[#17140f]/38 text-stone-400 hover:border-[#c9924a]/32 hover:text-[#eee7d7]"
+                }`}
+              >
+                {node.shortLabel}
+              </button>
+            ))}
+          </div>
         </section>
 
         <div className="lg:sticky lg:top-24 lg:self-start">
           <InfoPanel
             content={content}
             node={selectedNode}
-            gmEnabled={gmEnabled}
             onSelectNode={selectNode}
+            gmEnabled={gmEnabled}
           />
         </div>
       </div>

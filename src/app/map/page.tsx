@@ -23,7 +23,8 @@ export default async function MapPage() {
           </p>
         </div>
         <p className="max-w-sm text-sm leading-6 text-stone-500 lg:text-right">
-          Player view stays clean; GM mode reveals sealed notes without changing the map.
+          Select a hotspot to focus the map and open its codex entry.
+          {gmEnabled ? " GM mode is showing sealed notes." : " Player-safe text is shown by default."}
         </p>
       </div>
 

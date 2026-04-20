@@ -5,11 +5,11 @@ import { TagList } from "./tag-list";
 type InfoPanelProps = {
   content: GazetteerContent;
   node?: ContentNode;
-  gmEnabled: boolean;
   onSelectNode?: (node: ContentNode) => void;
+  gmEnabled: boolean;
 };
 
-export function InfoPanel({ content, node, gmEnabled, onSelectNode }: InfoPanelProps) {
+export function InfoPanel({ content, node, onSelectNode, gmEnabled }: InfoPanelProps) {
   if (!node) {
     return (
       <aside className="marr-panel rounded p-5">
@@ -25,13 +25,11 @@ export function InfoPanel({ content, node, gmEnabled, onSelectNode }: InfoPanelP
     );
   }
 
-  const relatedNodes = getRelatedNodes(
-    content,
-    node.related?.filter((related) => gmEnabled || !related.gmOnly),
-  );
+  const relatedNodes = getRelatedNodes(content, node.related);
   const childNodes = node.childNodeIds
     ?.map((id) => getNodeById(content, id))
     .filter((child): child is ContentNode => Boolean(child));
+  const gmContent = gmEnabled ? node.gm : undefined;
 
   return (
     <aside className="marr-panel max-h-none overflow-hidden rounded lg:max-h-[calc(100vh-7rem)] lg:overflow-auto">
@@ -106,6 +104,7 @@ export function InfoPanel({ content, node, gmEnabled, onSelectNode }: InfoPanelP
                   </span>
                   <span className="block text-xs uppercase tracking-[0.16em] text-stone-500">
                     {link.relationship} / {relatedNode.category}
+                    {link.gmOnly ? " / GM" : ""}
                   </span>
                 </button>
               ))}
@@ -129,52 +128,61 @@ export function InfoPanel({ content, node, gmEnabled, onSelectNode }: InfoPanelP
           </section>
         ) : null}
 
-        <TagList label="Tags" values={node.tags} />
-
-        {gmEnabled && node.gm ? (
-          <section className="rounded border border-[#8b3a2f]/38 bg-[#8b3a2f]/14 p-4">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-[#f1d1c8]">
-              GM-Only
+        {gmContent ? (
+          <section className="rounded border border-[#c9924a]/34 bg-[#2a1a10]/40 p-4">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-[#f0c987]">
+              GM Notes
             </h3>
-            {node.gm.description ? (
-              <p className="mt-3 text-sm leading-6 text-[#f1d1c8]/90">{node.gm.description}</p>
+
+            {gmContent.description ? (
+              <p className="mt-3 text-sm leading-6 text-[#ead8ba]">{gmContent.description}</p>
             ) : null}
-            {node.gm.secrets?.length ? (
-              <ul className="mt-3 space-y-2 text-sm leading-6 text-[#f1d1c8]/88">
-                {node.gm.secrets.map((secret) => (
-                  <li key={secret} className="border-l border-[#8b3a2f]/55 pl-3">
-                    {secret}
-                  </li>
-                ))}
-              </ul>
+
+            {gmContent.secrets?.length ? (
+              <SectionList title="Secrets" values={gmContent.secrets} accent="ember" />
             ) : null}
-            {node.gm.notes?.length ? (
-              <div className="mt-4 space-y-2 text-sm leading-6 text-[#f1d1c8]/78">
-                {node.gm.notes.map((note) => (
-                  <p key={note}>{note}</p>
+
+            {gmContent.notes?.length ? (
+              <SectionList title="Table Notes" values={gmContent.notes} accent="ash" />
+            ) : null}
+
+            {gmContent.statBlocks?.length ? (
+              <div className="mt-5 space-y-3">
+                <h4 className="text-xs font-semibold uppercase tracking-[0.22em] text-[#c9924a]/80">
+                  Stat Ideas
+                </h4>
+                {gmContent.statBlocks.map((statBlock) => (
+                  <div key={statBlock.id} className="rounded border marr-hairline bg-black/18 p-3">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <p className="text-sm font-semibold text-[#eee7d7]">{statBlock.name}</p>
+                      <span className="text-xs uppercase tracking-[0.16em] text-stone-500">
+                        {statBlock.system ?? "system-neutral"}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs text-[#c9924a]/85">{statBlock.role}</p>
+                    {statBlock.difficulty ? (
+                      <p className="mt-2 text-sm text-stone-300">Difficulty: {statBlock.difficulty}</p>
+                    ) : null}
+                    {statBlock.instincts?.length ? (
+                      <SectionList title="Instincts" values={statBlock.instincts} accent="ash" />
+                    ) : null}
+                    {statBlock.abilities?.length ? (
+                      <SectionList title="Abilities" values={statBlock.abilities} accent="ember" />
+                    ) : null}
+                    {statBlock.weaknesses?.length ? (
+                      <SectionList title="Weaknesses" values={statBlock.weaknesses} accent="ash" />
+                    ) : null}
+                    {statBlock.notes ? (
+                      <p className="mt-3 text-sm leading-6 text-stone-300">{statBlock.notes}</p>
+                    ) : null}
+                  </div>
                 ))}
               </div>
             ) : null}
-            {node.gm.statBlocks?.map((statBlock) => (
-              <div key={statBlock.id} className="mt-4 rounded border border-[#8b3a2f]/24 bg-black/24 p-3 text-sm text-[#f1d1c8]/86">
-                <p className="font-semibold">{statBlock.name}</p>
-                <p className="text-[#f1d1c8]/66">{statBlock.role}</p>
-                {statBlock.instincts?.length ? (
-                  <p className="mt-2">
-                    <span className="text-[#f1d1c8]">Instincts:</span>{" "}
-                    {statBlock.instincts.join("; ")}
-                  </p>
-                ) : null}
-                {statBlock.abilities?.length ? (
-                  <p className="mt-1">
-                    <span className="text-[#f1d1c8]">Abilities:</span>{" "}
-                    {statBlock.abilities.join("; ")}
-                  </p>
-                ) : null}
-              </div>
-            ))}
           </section>
         ) : null}
+
+        <TagList label="Tags" values={node.tags} />
       </div>
     </aside>
   );
