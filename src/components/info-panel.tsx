@@ -18,7 +18,7 @@ export function InfoPanel({ content, node, onSelectNode, gmEnabled }: InfoPanelP
         </p>
         <h2 className="mt-3 text-2xl font-semibold text-[#eee7d7]">Choose a landmark</h2>
         <p className="mt-3 text-sm leading-6 text-stone-300">
-          Hover the map to reveal interactive regions, then select a landmark to focus the map
+          Tap or hover the map to reveal interactive regions, then select a landmark to focus the map
           and read its player-facing entry.
         </p>
       </aside>

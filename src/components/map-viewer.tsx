@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { AreaDefinition, ContentNode, GazetteerContent, MapDefinition } from "@/content/types";
 import { getNodeById, getNodesForArea } from "@/content/validation";
 import { AreaHotspot, getRegionCenter } from "./area-hotspot";
@@ -16,6 +16,7 @@ type MapViewerProps = {
 export function MapViewer({ content, areas, gmEnabled }: MapViewerProps) {
   const [selectedAreaId, setSelectedAreaId] = useState(areas[0]?.id ?? "");
   const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>();
+  const infoPanelRef = useRef<HTMLDivElement>(null);
 
   const selectedArea = areas.find((area) => area.id === selectedAreaId) ?? areas[0];
   const selectedMap = content.maps.find((map) => map.id === selectedArea?.mapId);
@@ -43,11 +44,22 @@ export function MapViewer({ content, areas, gmEnabled }: MapViewerProps) {
     }
 
     setSelectedNodeId(node.id);
+    scrollCodexIntoViewOnMobile();
   }
 
   function resetToOverview() {
     setSelectedAreaId(areas[0]?.id ?? "");
     setSelectedNodeId(undefined);
+  }
+
+  function scrollCodexIntoViewOnMobile() {
+    if (typeof window === "undefined" || !window.matchMedia("(max-width: 1023px)").matches) {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      infoPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }
 
   return (
@@ -180,7 +192,7 @@ export function MapViewer({ content, areas, gmEnabled }: MapViewerProps) {
           </div>
         </section>
 
-        <div className="lg:sticky lg:top-24 lg:self-start">
+        <div ref={infoPanelRef} className="scroll-mt-24 lg:sticky lg:top-24 lg:self-start">
           <InfoPanel
             content={content}
             node={selectedNode}

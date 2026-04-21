@@ -1,22 +1,22 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { disableGmMode, enableGmMode, isValidGmPassword } from "@/lib/gm-session";
+import {
+  disableGmMode,
+  enableGmMode,
+  isGmPasswordConfigured,
+  isValidGmPassword,
+} from "@/lib/gm-session";
 
-export type GmLoginState = {
-  error?: string;
-};
-
-export async function loginGmMode(
-  _previousState: GmLoginState,
-  formData: FormData,
-): Promise<GmLoginState> {
+export async function loginGmMode(formData: FormData) {
   const password = String(formData.get("password") ?? "");
 
+  if (!isGmPasswordConfigured()) {
+    redirect("/gm?error=missing-config");
+  }
+
   if (!isValidGmPassword(password)) {
-    return {
-      error: "That password did not open the sealed notes.",
-    };
+    redirect("/gm?error=invalid-password");
   }
 
   await enableGmMode();

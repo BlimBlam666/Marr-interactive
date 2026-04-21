@@ -3,8 +3,22 @@ import { logoutGmMode } from "@/app/actions";
 import { GmLoginForm } from "@/components/gm-login-form";
 import { isGmModeEnabled } from "@/lib/gm-session";
 
-export default async function GmPage() {
+type GmPageProps = {
+  searchParams?: Promise<{
+    error?: string | string[];
+  }>;
+};
+
+const gmLoginErrors: Record<string, string> = {
+  "invalid-password": "That password did not open the sealed notes.",
+  "missing-config": "GM mode is not configured yet. Set MARR_GM_PASSWORD on the server.",
+};
+
+export default async function GmPage({ searchParams }: GmPageProps) {
   const gmEnabled = await isGmModeEnabled();
+  const params = await searchParams;
+  const errorKey = Array.isArray(params?.error) ? params.error[0] : params?.error;
+  const loginError = errorKey ? gmLoginErrors[errorKey] : undefined;
 
   return (
     <main className="mx-auto grid min-h-[calc(100vh-68px)] w-full max-w-5xl place-items-center px-4 py-12 sm:px-8">
@@ -31,7 +45,7 @@ export default async function GmPage() {
             </button>
           </form>
         ) : (
-          <GmLoginForm />
+          <GmLoginForm error={loginError} />
         )}
 
         <Link

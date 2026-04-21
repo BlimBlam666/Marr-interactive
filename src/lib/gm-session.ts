@@ -27,6 +27,10 @@ export async function disableGmMode() {
   cookieStore.delete(GM_COOKIE_NAME);
 }
 
+export function isGmPasswordConfigured() {
+  return Boolean(process.env.MARR_GM_PASSWORD);
+}
+
 export function isValidGmPassword(password: string) {
   const configuredPassword = process.env.MARR_GM_PASSWORD;
 

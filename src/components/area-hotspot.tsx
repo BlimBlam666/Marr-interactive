@@ -1,6 +1,7 @@
 "use client";
 
-import type { KeyboardEvent } from "react";
+import { useRef } from "react";
+import type { KeyboardEvent, PointerEvent, TouchEvent } from "react";
 import type { ContentCategory, ContentNode } from "@/content/types";
 
 type AreaHotspotProps = {
@@ -26,6 +27,8 @@ const hotspotPaint: Record<ContentCategory, { fill: string; stroke: string }> = 
 };
 
 export function AreaHotspot({ node, selected, onSelect }: AreaHotspotProps) {
+  const lastTouchSelectAt = useRef(0);
+
   if (!node.region) {
     return null;
   }
@@ -40,6 +43,37 @@ export function AreaHotspot({ node, selected, onSelect }: AreaHotspotProps) {
     }
   }
 
+  function handlePointerUp(event: PointerEvent<SVGGElement>) {
+    if (event.pointerType === "mouse") {
+      return;
+    }
+
+    event.preventDefault();
+    selectFromTouchLikeInput();
+  }
+
+  function handleTouchEnd(event: TouchEvent<SVGGElement>) {
+    event.preventDefault();
+    selectFromTouchLikeInput();
+  }
+
+  function handleClick() {
+    if (Date.now() - lastTouchSelectAt.current < 750) {
+      return;
+    }
+
+    onSelect(node);
+  }
+
+  function selectFromTouchLikeInput() {
+    if (Date.now() - lastTouchSelectAt.current < 80) {
+      return;
+    }
+
+    lastTouchSelectAt.current = Date.now();
+    onSelect(node);
+  }
+
   return (
     <g
       role="button"
@@ -47,8 +81,11 @@ export function AreaHotspot({ node, selected, onSelect }: AreaHotspotProps) {
       aria-label={`Focus ${node.title}`}
       aria-pressed={selected}
       className="group cursor-pointer outline-none"
-      onClick={() => onSelect(node)}
+      onClick={handleClick}
       onKeyDown={handleKeyDown}
+      onPointerUp={handlePointerUp}
+      onTouchEnd={handleTouchEnd}
+      style={{ touchAction: "manipulation" }}
     >
       {node.region.type === "box" ? (
         <rect
