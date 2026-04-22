@@ -45,15 +45,20 @@
   - Fix: hotspots now handle non-mouse pointer activation and touch-end activation directly, while suppressing duplicate synthetic clicks.
   - Fix: selecting a node on mobile scrolls the codex panel into view after state updates, so player text and GM notes are visible immediately.
   - Verified by code-path review, lint, production build, and route-level player/GM visibility checks. A final physical phone retest is still required to confirm the reported LAN-device failure is gone.
+- Remaining mobile interaction bugfix:
+  - Root cause: the failure was broader than SVG hotspots. The real phone could use server-rendered links/forms such as GM login, but pure client-state map controls like the "Below" area button did not respond, which points to mobile hydration/client-event attachment failing or being blocked in that environment.
+  - Fix: map area and node selection are now URL-addressable with normal links (`/map?area=...&node=...#codex`) while preserving the hydrated React state behavior for desktop and healthy clients.
+  - Fix: SVG hotspots are anchors with `href`, giving real mobile browsers a native navigation fallback if React events do not attach.
+  - Fix: `/map` reads `searchParams` server-side and renders the selected area/node codex directly, so "Below", Hanging Cages, and UndaMarr nodes can open content without relying on client JavaScript.
 
 ## Remaining In Phase 1
 
-- Phase 1 MVP is effectively complete after one final physical phone retest confirms map hotspots open the codex in player mode and GM mode.
+- Phase 1 MVP is effectively complete after one final physical phone retest confirms URL-backed map controls open the codex in player mode and GM mode.
 - Keep leak checks in the normal build/verification habit whenever codex fields change.
 
 ## Recommended Next Single Step
 
-Retest `/map` on the real phone over LAN: tap Hanging Cages on Surface Marr, tap one UndaMarr node, then repeat in GM mode. If the codex opens and GM notes appear when unlocked, freeze Phase 1.
+Retest `/map` on the real phone over LAN: tap Below, tap Hanging Cages on Surface Marr, tap one UndaMarr node, then repeat in GM mode. If the URL-backed controls open the codex and GM notes appear when unlocked, freeze Phase 1.
 
 ## Known Risks Or Weak Spots
 

@@ -11,11 +11,26 @@ type MapViewerProps = {
   content: GazetteerContent;
   areas: AreaDefinition[];
   gmEnabled: boolean;
+  initialAreaId?: string;
+  initialNodeId?: string;
 };
 
-export function MapViewer({ content, areas, gmEnabled }: MapViewerProps) {
-  const [selectedAreaId, setSelectedAreaId] = useState(areas[0]?.id ?? "");
-  const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>();
+export function MapViewer({
+  content,
+  areas,
+  gmEnabled,
+  initialAreaId,
+  initialNodeId,
+}: MapViewerProps) {
+  const initialNode = initialNodeId ? getNodeById(content, initialNodeId) : undefined;
+  const initialNodeArea = initialNode ? areas.find((area) => area.nodeIds.includes(initialNode.id)) : undefined;
+  const safeInitialAreaId =
+    initialNodeArea?.id ??
+    (initialAreaId && areas.some((area) => area.id === initialAreaId) ? initialAreaId : areas[0]?.id) ??
+    "";
+  const safeInitialNodeId = initialNode ? initialNode.id : undefined;
+  const [selectedAreaId, setSelectedAreaId] = useState(safeInitialAreaId);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>(safeInitialNodeId);
   const infoPanelRef = useRef<HTMLDivElement>(null);
 
   const selectedArea = areas.find((area) => area.id === selectedAreaId) ?? areas[0];
@@ -80,11 +95,14 @@ export function MapViewer({ content, areas, gmEnabled }: MapViewerProps) {
         />
         <div className="flex flex-wrap gap-2">
           {areas.map((area) => (
-            <button
+            <a
               key={area.id}
-              type="button"
-              aria-pressed={area.id === selectedArea.id}
-              onClick={() => selectArea(area.id)}
+              href={getMapHref(area.id)}
+              aria-current={area.id === selectedArea.id ? "true" : undefined}
+              onClick={(event) => {
+                event.preventDefault();
+                selectArea(area.id);
+              }}
               className={`rounded border px-4 py-2 text-sm transition ${
                 area.id === selectedArea.id
                   ? "border-[#c9924a]/45 bg-[#c9924a]/13 text-[#eee7d7]"
@@ -92,7 +110,7 @@ export function MapViewer({ content, areas, gmEnabled }: MapViewerProps) {
               }`}
             >
               {area.shortLabel}
-            </button>
+            </a>
           ))}
         </div>
       </div>
@@ -134,6 +152,7 @@ export function MapViewer({ content, areas, gmEnabled }: MapViewerProps) {
                       key={node.id}
                       node={node}
                       selected={focusedNode?.id === node.id}
+                      href={getMapHref(selectedArea.id, node.id)}
                       onSelect={selectNode}
                     />
                   ))
@@ -175,11 +194,14 @@ export function MapViewer({ content, areas, gmEnabled }: MapViewerProps) {
 
           <div className="mt-3 flex flex-wrap gap-2">
             {areaNodes.map((node) => (
-              <button
+              <a
                 key={node.id}
-                type="button"
-                aria-pressed={selectedNode?.id === node.id}
-                onClick={() => selectNode(node)}
+                href={getMapHref(selectedArea.id, node.id)}
+                aria-current={selectedNode?.id === node.id ? "location" : undefined}
+                onClick={(event) => {
+                  event.preventDefault();
+                  selectNode(node);
+                }}
                 className={`rounded border px-2.5 py-1.5 text-xs transition ${
                   selectedNode?.id === node.id
                     ? "border-[#c9924a]/45 bg-[#c9924a]/13 text-[#eee7d7]"
@@ -187,12 +209,12 @@ export function MapViewer({ content, areas, gmEnabled }: MapViewerProps) {
                 }`}
               >
                 {node.shortLabel}
-              </button>
+              </a>
             ))}
           </div>
         </section>
 
-        <div ref={infoPanelRef} className="scroll-mt-24 lg:sticky lg:top-24 lg:self-start">
+        <div id="codex" ref={infoPanelRef} className="scroll-mt-24 lg:sticky lg:top-24 lg:self-start">
           <InfoPanel
             content={content}
             node={selectedNode}
@@ -203,6 +225,22 @@ export function MapViewer({ content, areas, gmEnabled }: MapViewerProps) {
       </div>
     </div>
   );
+}
+
+function getMapHref(areaId?: string, nodeId?: string) {
+  const params = new URLSearchParams();
+
+  if (areaId) {
+    params.set("area", areaId);
+  }
+
+  if (nodeId) {
+    params.set("node", nodeId);
+  }
+
+  const query = params.toString();
+
+  return `/map${query ? `?${query}` : ""}${nodeId ? "#codex" : ""}`;
 }
 
 function getFocusedViewBox(map: MapDefinition | undefined, node: ContentNode | undefined) {

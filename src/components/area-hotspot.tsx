@@ -1,12 +1,13 @@
 "use client";
 
 import { useRef } from "react";
-import type { KeyboardEvent, PointerEvent, TouchEvent } from "react";
+import type { KeyboardEvent, MouseEvent, PointerEvent, TouchEvent } from "react";
 import type { ContentCategory, ContentNode } from "@/content/types";
 
 type AreaHotspotProps = {
   node: ContentNode;
   selected: boolean;
+  href: string;
   onSelect: (node: ContentNode) => void;
 };
 
@@ -26,7 +27,7 @@ const hotspotPaint: Record<ContentCategory, { fill: string; stroke: string }> = 
   site: { fill: "rgba(201, 146, 74, 0.14)", stroke: "#e7dcc3" },
 };
 
-export function AreaHotspot({ node, selected, onSelect }: AreaHotspotProps) {
+export function AreaHotspot({ node, selected, href, onSelect }: AreaHotspotProps) {
   const lastTouchSelectAt = useRef(0);
 
   if (!node.region) {
@@ -36,14 +37,14 @@ export function AreaHotspot({ node, selected, onSelect }: AreaHotspotProps) {
   const paint = hotspotPaint[node.category];
   const center = getRegionCenter(node);
 
-  function handleKeyDown(event: KeyboardEvent<SVGGElement>) {
+  function handleKeyDown(event: KeyboardEvent<HTMLAnchorElement>) {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       onSelect(node);
     }
   }
 
-  function handlePointerUp(event: PointerEvent<SVGGElement>) {
+  function handlePointerUp(event: PointerEvent<HTMLAnchorElement>) {
     if (event.pointerType === "mouse") {
       return;
     }
@@ -52,12 +53,14 @@ export function AreaHotspot({ node, selected, onSelect }: AreaHotspotProps) {
     selectFromTouchLikeInput();
   }
 
-  function handleTouchEnd(event: TouchEvent<SVGGElement>) {
+  function handleTouchEnd(event: TouchEvent<HTMLAnchorElement>) {
     event.preventDefault();
     selectFromTouchLikeInput();
   }
 
-  function handleClick() {
+  function handleClick(event: MouseEvent<HTMLAnchorElement>) {
+    event.preventDefault();
+
     if (Date.now() - lastTouchSelectAt.current < 750) {
       return;
     }
@@ -75,11 +78,10 @@ export function AreaHotspot({ node, selected, onSelect }: AreaHotspotProps) {
   }
 
   return (
-    <g
-      role="button"
+    <a
+      href={href}
       tabIndex={0}
       aria-label={`Focus ${node.title}`}
-      aria-pressed={selected}
       className="group cursor-pointer outline-none"
       onClick={handleClick}
       onKeyDown={handleKeyDown}
@@ -133,7 +135,7 @@ export function AreaHotspot({ node, selected, onSelect }: AreaHotspotProps) {
         {node.shortLabel}
       </text>
       <title>{node.title}</title>
-    </g>
+    </a>
   );
 }
 

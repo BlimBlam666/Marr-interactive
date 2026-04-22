@@ -3,9 +3,19 @@ import { campaignAreas, marrContent } from "@/content/marr";
 import { getVisibleGazetteerContent } from "@/lib/gm-visibility";
 import { isGmModeEnabled } from "@/lib/gm-session";
 
-export default async function MapPage() {
+type MapPageProps = {
+  searchParams?: Promise<{
+    area?: string | string[];
+    node?: string | string[];
+  }>;
+};
+
+export default async function MapPage({ searchParams }: MapPageProps) {
   const gmEnabled = await isGmModeEnabled();
   const visibleContent = getVisibleGazetteerContent(marrContent, gmEnabled);
+  const params = await searchParams;
+  const requestedAreaId = getSingleParam(params?.area);
+  const requestedNodeId = getSingleParam(params?.node);
 
   return (
     <main className="mx-auto w-full max-w-7xl px-4 py-7 sm:px-8 sm:py-9">
@@ -28,7 +38,17 @@ export default async function MapPage() {
         </p>
       </div>
 
-      <MapViewer content={visibleContent} areas={campaignAreas} gmEnabled={gmEnabled} />
+      <MapViewer
+        content={visibleContent}
+        areas={campaignAreas}
+        gmEnabled={gmEnabled}
+        initialAreaId={requestedAreaId}
+        initialNodeId={requestedNodeId}
+      />
     </main>
   );
+}
+
+function getSingleParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
 }
