@@ -1,0 +1,47 @@
+name: Import Marr Atlas artwork
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/import-marr-assets.yml
+      - asset-checksums.sha256
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: import-marr-atlas-artwork
+  cancel-in-progress: true
+
+jobs:
+  import-artwork:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+
+      - name: Download and verify the release artwork
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_url="https://marr-interactive-atlas.blimblam.chatgpt.site"
+          while read -r checksum path; do
+            mkdir -p "$(dirname "$path")"
+            curl --fail --location --retry 3 --silent --show-error "$source_url/$path" --output "$path"
+          done < asset-checksums.sha256
+          sha256sum --check asset-checksums.sha256
+
+      - name: Commit imported artwork
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add icons maps
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "Add Marr Atlas artwork"
+          git push

@@ -2,6 +2,14 @@
 
 Marr Interactive is a content-driven Next.js app for exploring a fantasy campaign setting as a visual gazetteer. Every explorable thing is modeled as a content node: landmarks, districts, factions, NPCs, relics, rumors, dungeon rooms, hazards, and future lore objects all use the same core shape.
 
+## Player Atlas
+
+The complete player-facing Atlas is published through GitHub Pages:
+
+**https://blimblam666.github.io/Marr-interactive/**
+
+GitHub Pages serves the static release files at the repository root (`index.html`, `styles.css`, the Atlas data and interaction scripts, maps, icons, manifest, and service worker). The static release is intentionally player-safe and is independent of the older experimental Next.js GM-mode source below.
+
 ## Tech Stack
 
 - Next.js App Router

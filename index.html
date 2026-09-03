@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#27251f" />
+    <meta
+      name="description"
+      content="A player-safe interactive charcoal atlas of Marr Proper, UndaMarr, the Roots, and the Surface with Cairn 2e game material."
+    />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Marr Atlas" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>The Marr Atlas</title>
+    <base href="/Marr-interactive/" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./data.js" defer></script>
+    <script src="./phase2-data.js" defer></script>
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#guideContent">Skip to field guide</a>
+    <div class="grain" aria-hidden="true"></div>
+
+    <header class="masthead">
+      <a class="brand" id="homeButton" href="./" aria-label="Return to the map of Marr">
+        <span class="brand-mark" aria-hidden="true">♧</span>
+        <span>
+          <strong>The Marr Atlas</strong>
+          <small>A player’s field guide</small>
+        </span>
+      </a>
+
+      <label class="search-box" for="atlasSearch">
+        <span class="visually-hidden">Search the Marr Atlas</span>
+        <span aria-hidden="true">⌕</span>
+        <input
+          id="atlasSearch"
+          type="search"
+          autocomplete="off"
+          placeholder="Search places, wares, people…"
+          aria-label="Search the Marr Atlas"
+        />
+        <kbd aria-hidden="true">/</kbd>
+      </label>
+
+      <div class="header-actions">
+        <span class="offline-badge" id="offlineBadge" hidden>Offline</span>
+        <span class="safety-seal" title="No referee secrets are stored in this edition">Player-safe</span>
+        <button class="ink-button compact" id="installButton" type="button" hidden>Install</button>
+        <button class="ink-button compact" id="ledgerButton" type="button">Ledger</button>
+        <button class="ink-button compact" id="aboutButton" type="button">About</button>
+      </div>
+    </header>
+
+    <nav class="realm-bar" id="realmBar" aria-label="Atlas regions"></nav>
+
+    <main class="atlas-shell">
+      <section class="map-column" id="mapColumn" aria-labelledby="mapTitle">
+        <div class="map-toolbar">
+          <div>
+            <nav class="breadcrumbs" id="breadcrumbs" aria-label="Map breadcrumb"></nav>
+            <h1 id="mapTitle">Marr</h1>
+            <p id="mapSubtitle">A village beneath the wounded boughs</p>
+          </div>
+          <div class="map-actions">
+            <button class="ink-button compact" id="fullscreenButton" type="button" aria-pressed="false">Full map</button>
+            <button class="ink-button compact" id="fitButton" type="button" title="Reset the map view">Reset view</button>
+          </div>
+        </div>
+
+        <div class="map-frame" id="mapFrame">
+          <div class="map-paper" id="mapPaper">
+            <img id="mapImage" src="./maps/marr.webp" alt="Charcoal map of Marr" />
+            <div class="realm-illustration" id="realmIllustration" aria-hidden="true" hidden></div>
+            <div class="map-hotspots" id="mapHotspots" aria-label="Map locations"></div>
+          </div>
+          <div class="map-hint" id="mapHint">
+            <span class="pulse-dot" aria-hidden="true"></span>
+            Select a numbered mark to enter a location
+          </div>
+        </div>
+      </section>
+
+      <aside class="guide-column" id="guidePanel" aria-labelledby="guideTitle">
+        <button class="sheet-handle" id="sheetHandle" type="button" aria-label="Collapse field guide">
+          <span aria-hidden="true"></span>
+        </button>
+        <div class="guide-head">
+          <div>
+            <p class="eyebrow" id="guideEyebrow">Traveler’s folio</p>
+            <h2 id="guideTitle">Eight paths into Marr</h2>
+          </div>
+          <span class="folio-number" id="folioNumber" aria-hidden="true">I</span>
+        </div>
+
+        <div class="tab-row" role="tablist" aria-label="Field guide sections">
+          <button class="tab active" id="guideTab" role="tab" aria-selected="true" aria-controls="guideContent" type="button">Field guide</button>
+          <button class="tab" id="rulesTab" role="tab" aria-selected="false" aria-controls="guideContent" type="button">Cairn 2e</button>
+          <button class="tab" id="indexTab" role="tab" aria-selected="false" aria-controls="guideContent" type="button">Atlas index</button>
+        </div>
+
+        <div class="guide-scroll" id="guideContent" role="tabpanel" tabindex="-1" aria-live="polite"></div>
+      </aside>
+    </main>
+
+    <nav class="mobile-dock" aria-label="Atlas view controls">
+      <button id="mobileMapButton" type="button" aria-pressed="true"><span aria-hidden="true">⌖</span> Map</button>
+      <button id="mobileFolioButton" type="button" aria-pressed="false"><span aria-hidden="true">▤</span> Folio</button>
+      <button id="mobileFullButton" type="button" aria-pressed="false"><span aria-hidden="true">⛶</span> Full map</button>
+    </nav>
+
+    <dialog id="aboutDialog">
+      <div class="dialog-ornament" aria-hidden="true">✦</div>
+      <h2>A map for those who walk Marr</h2>
+      <p>
+        This edition contains only things a traveler can see, buy, hear, learn openly, or face directly.
+        No referee notes, hidden motives, secret doors, unrevealed solutions, or campaign truths are stored in these files.
+      </p>
+      <p>
+        Travel through Marr Proper, UndaMarr, the living Roots, and the Surface. The Atlas Index
+        cross-references public places, people, wares, factions, routes, and rumors. Campaign status
+        moves from Unknown to Rumored, Discovered, Visited, and Changed on this device.
+      </p>
+      <p>
+        Install the atlas on a phone for offline use. Every map, route, field entry, posted ware, and
+        Cairn 2e profile remains available when the road has no signal.
+      </p>
+      <p>“Cairn” is the work of Yochai Gal and is not affiliated with this atlas.</p>
+      <p class="small-print">Original Marr material. Cairn 2e compatibility text released under CC BY-SA 4.0.</p>
+      <form method="dialog">
+        <button class="ink-button" type="submit">Close folio</button>
+      </form>
+    </dialog>
+
+    <dialog id="ledgerDialog" aria-labelledby="ledgerTitle">
+      <div class="dialog-ornament" aria-hidden="true">✦</div>
+      <h2 id="ledgerTitle">Traveler’s Ledger</h2>
+      <p>
+        Discovery marks are stored only on this device. Download a backup before changing browsers,
+        clearing site data, or moving the atlas to another address.
+      </p>
+      <div class="ledger-summary" id="ledgerSummary" aria-label="Discovery ledger summary"></div>
+      <div class="dialog-actions">
+        <button class="ink-button" id="downloadLedgerButton" type="button">Download backup</button>
+        <button class="ink-button secondary" id="restoreLedgerButton" type="button">Restore backup</button>
+        <button class="ink-button secondary" id="closeLedgerButton" type="button">Close</button>
+      </div>
+      <input id="ledgerFileInput" type="file" accept="application/json,.json" hidden />
+      <p class="ledger-status" id="ledgerStatus" role="status" aria-live="polite"></p>
+    </dialog>
+
+    <noscript>
+      <p class="noscript">This atlas needs JavaScript enabled to open its marked locations.</p>
+    </noscript>
+  </body>
+</html>

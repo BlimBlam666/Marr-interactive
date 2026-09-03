@@ -1,0 +1,27 @@
+{
+  "name": "The Marr Interactive Atlas",
+  "short_name": "Marr Atlas",
+  "description": "A player-safe charcoal field guide to Marr Proper, UndaMarr, the Roots, and the Surface.",
+  "id": "/Marr-interactive/",
+  "start_url": "/Marr-interactive/",
+  "scope": "/Marr-interactive/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#d7c8a8",
+  "theme_color": "#27251f",
+  "categories": ["games", "books", "utilities"],
+  "icons": [
+    {
+      "src": "/Marr-interactive/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/Marr-interactive/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
