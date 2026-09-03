@@ -18,6 +18,17 @@
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./icons/icon-192.png" />
     <link rel="stylesheet" href="./styles.css" />
+    <script>
+      (() => {
+        const key = "marr-atlas-deep-link";
+        const savedPath = sessionStorage.getItem(key);
+        if (!savedPath) return;
+        sessionStorage.removeItem(key);
+        if (savedPath.startsWith("/Marr-interactive/")) {
+          window.history.replaceState(null, "", savedPath);
+        }
+      })();
+    </script>
     <script src="./data.js" defer></script>
     <script src="./phase2-data.js" defer></script>
     <script src="./app.js" defer></script>
