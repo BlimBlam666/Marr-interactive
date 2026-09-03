@@ -10,6 +10,8 @@ The complete player-facing Atlas is published through GitHub Pages:
 
 GitHub Pages serves the static release files at the repository root (`index.html`, `styles.css`, the Atlas data and interaction scripts, maps, icons, manifest, and service worker). The static release is intentionally player-safe and is independent of the older experimental Next.js GM-mode source below.
 
+The published release includes four regions, 21 illustrated locations, 151 keyed entries, deep links, campaign-state tracking, and offline installation support.
+
 ## Tech Stack
 
 - Next.js App Router
